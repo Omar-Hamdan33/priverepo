@@ -288,6 +288,7 @@ h1,h2,h3{ font-family: var(--font-display); font-weight: 500; color: var(--ink);
 }
 .cart-line__remove:hover{ color: var(--rust); background: var(--rust-light); }
 .cart-drawer__foot{ padding: 20px 22px 26px; border-top: 1px solid var(--border-soft); }
+.is-dodging{ position: fixed; z-index: 999; transition: left 0.15s ease-out, top 0.15s ease-out; }
 .cart-drawer__subtotal{ display: flex; justify-content: space-between; font-size: 1.02rem; margin-bottom: 6px; }
 .cart-drawer__note{ font-size: 0.78rem; color: var(--ink-faint); margin-bottom: 16px; }
 .cart-drawer__demo{ font-size: 0.75rem; color: var(--ink-faint); text-align: center; margin-top: 10px; }

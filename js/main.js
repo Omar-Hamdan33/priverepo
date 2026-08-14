@@ -129,6 +129,7 @@
     cartDrawer.classList.remove('is-open');
     cartDrawer.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    stopDodging();
   };
 
   cartOpenBtn?.addEventListener('click', openCart);
@@ -221,6 +222,7 @@
   const checkoutBtn = document.getElementById('checkoutBtn');
   checkoutBtn?.addEventListener('click', () => {
     if (cartQty <= 0) return;
+    stopDodging();
     const original = checkoutBtn.textContent;
     checkoutBtn.disabled = true;
     checkoutBtn.textContent = 'Bezig…';
@@ -235,6 +237,62 @@
       checkoutBtn.disabled = false;
       checkoutBtn.textContent = original;
     }, 700);
+  });
+
+  /* ---------- checkout button dodges the cursor (easter egg) ---------- */
+  const DODGE_RADIUS = 120; // px — button jumps once the cursor gets this close
+  let dodging = false;
+
+  const startDodging = () => {
+    if (dodging || !checkoutBtn) return;
+    dodging = true;
+    const rect = checkoutBtn.getBoundingClientRect();
+    checkoutBtn.style.width = rect.width + 'px';
+    checkoutBtn.style.left = rect.left + 'px';
+    checkoutBtn.style.top = rect.top + 'px';
+    checkoutBtn.classList.add('is-dodging');
+    document.body.appendChild(checkoutBtn);
+  };
+
+  function stopDodging() {
+    if (!dodging || !checkoutBtn) return;
+    dodging = false;
+    checkoutBtn.classList.remove('is-dodging');
+    checkoutBtn.style.left = '';
+    checkoutBtn.style.top = '';
+    checkoutBtn.style.width = '';
+    cartFoot.insertBefore(checkoutBtn, cartFoot.querySelector('.cart-drawer__demo'));
+  }
+
+  // tries a handful of random spots and jumps to whichever lands furthest from the cursor
+  const jumpAwayFrom = (x, y) => {
+    const w = checkoutBtn.offsetWidth;
+    const h = checkoutBtn.offsetHeight;
+    const margin = 12;
+    const maxLeft = Math.max(margin, window.innerWidth - w - margin);
+    const maxTop = Math.max(margin, window.innerHeight - h - margin);
+    let best = null, bestDist = -1;
+    for (let i = 0; i < 12; i++) {
+      const left = margin + Math.random() * (maxLeft - margin);
+      const top = margin + Math.random() * (maxTop - margin);
+      const dist = Math.hypot(left + w / 2 - x, top + h / 2 - y);
+      if (dist > bestDist) { bestDist = dist; best = { left, top }; }
+    }
+    checkoutBtn.style.left = best.left + 'px';
+    checkoutBtn.style.top = best.top + 'px';
+  };
+
+  document.addEventListener('mousemove', e => {
+    if (!checkoutBtn || checkoutBtn.disabled || cartQty <= 0 || !cartDrawer.classList.contains('is-open')) {
+      if (dodging) stopDodging();
+      return;
+    }
+    const rect = checkoutBtn.getBoundingClientRect();
+    const dist = Math.hypot(rect.left + rect.width / 2 - e.clientX, rect.top + rect.height / 2 - e.clientY);
+    if (dist < DODGE_RADIUS) {
+      if (!dodging) startDodging();
+      jumpAwayFrom(e.clientX, e.clientY);
+    }
   });
 
   /* ---------- bundle pricing (product section) ---------- */

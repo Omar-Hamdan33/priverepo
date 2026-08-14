@@ -143,6 +143,14 @@
     </div>
   `;
 
+  const ORDER_CONFIRM_HTML = `
+    <div class="cart-empty cart-success">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9.3" stroke="currentColor" stroke-width="1.4"/><path d="M8 12.4l2.6 2.6L16 9.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p>Bestelling geplaatst ✓<br>Bedankt! Dit is een demo — er is niets echt besteld of betaald.</p>
+      <button class="btn btn--ghost btn--sm" data-close-cart>Verder winkelen</button>
+    </div>
+  `;
+
   // mock cart holds a single line for the one product; unit price is the
   // average of whatever was added so the qty stepper can scale it cleanly
   let cartUnitPrice = 0;
@@ -207,6 +215,26 @@
     } else if (close) {
       closeCart();
     }
+  });
+
+  /* ---------- checkout (mock) ---------- */
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  checkoutBtn?.addEventListener('click', () => {
+    if (cartQty <= 0) return;
+    const original = checkoutBtn.textContent;
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = 'Bezig…';
+    setTimeout(() => {
+      cartQty = 0;
+      cartMoney = 0;
+      cartUnitPrice = 0;
+      cartBody.innerHTML = ORDER_CONFIRM_HTML;
+      cartFoot.hidden = true;
+      cartCount.hidden = true;
+      cartCount.textContent = '0';
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = original;
+    }, 700);
   });
 
   /* ---------- bundle pricing (product section) ---------- */
